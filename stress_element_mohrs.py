@@ -1,21 +1,11 @@
+import argparse
 import numpy as np
 
-
-"""Input for an element"""
-sigma_x = 0
-sigma_y = -11600
-tau_xy = 0
-theta_deg = 45  # degrees, ccw is positive
-visualize = False
-
-
-import argparse
-
 parser = argparse.ArgumentParser(description="Shear Tranforms and Mohr's Circle")
-parser.add_argument('--sx', type=float, default=0.0)
-parser.add_argument('--sy', type=float, default=0.0)
-parser.add_argument('--txy', type=float, default=0.0)
-parser.add_argument('--deg', type=float, default=0.0)
+parser.add_argument('--sx', type=float, default=0.0, metavar="Stress in X axis")
+parser.add_argument('--sy', type=float, default=0.0, metavar="Stress in Y axis")
+parser.add_argument('--txy', type=float, default=0.0, metavar="Shear Stress.")
+parser.add_argument('--deg', type=float, default=0.0, metavar="Degrees. Cut plane angle positive in ccw direction from X axis.")
 parser.add_argument('--v', action='store_true')
 args = parser.parse_args()
 
@@ -68,7 +58,7 @@ else:
     theta_p1 = theta_p1_temp
     theta_p2 = theta_p2_temp
 
-print("orientation of principal planes of stress")
+print("Orientation of Principal Planes of Stress")
 
 print("θ p1={:.6f}".format(theta_p1))
 sigma_x_prime_p1 = (0.5*(sigma_x+sigma_y)) + (0.5*(sigma_x-sigma_y)*np.cos(2*np.radians(theta_p1))) + (tau_xy*np.sin(2*np.radians(theta_p1)))
