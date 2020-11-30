@@ -3,7 +3,7 @@ Requirements: pip install numpy pillow
 
 Notes:
     - Compression = Positive Stress
-    - Check units
+    - Use the same units for all inputs
 
 
 hookes_law.py
