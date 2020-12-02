@@ -116,12 +116,16 @@ print("σ1={:.6f}, σ2={:.6f}".format(sigma_1, sigma_2))
 
 if sigma_1 * sigma_2 > 0 :  # same sign
     print("σ1 and σ2 have the same sign.")
+    print("σ3 is out of plane.")
     if abs(sigma_1) > abs(sigma_2):
+        print("σ1 is larger.")
         tau_abs_max = 0.5*sigma_1
     else:
+        print("σ2 is larger.")
         tau_abs_max = 0.5*sigma_2
 else:  # opposite sign
     print("σ1 and σ2 have the opposite sign.")
+    print("maximum shear equals tau max in-plane.")
     tau_abs_max = 0.5*(sigma_1-sigma_2)
 
 print("τ abs max = {}".format(tau_abs_max))
@@ -132,15 +136,15 @@ print("\nMohr's Circle")
 
 print("X point = ({:.6f}, {:.6f})".format(sigma_x, -tau_xy))
 print("Rotate X to the closest X axis.")
-print("2 θp = {}".format( np.degrees( np.arctan2( -tau_xy, sigma_x-sigma_avg )) ) )
+print("2 θp = {} from the σ+ axis.".format( np.degrees( np.arctan2( -tau_xy, sigma_x-sigma_avg )) ) )
 print("Y point = ({:.6f}, {:.6f})".format(sigma_y, tau_xy))
 print("Center (σ avg) = ({:.6f}, 0)".format(sigma_avg))
-print("Radius (τ max) = {:.6f}".format(tau_max_in_plane))
+print("Radius (τ max) = {:.6f}".format(abs(tau_max_in_plane)))
 
 
 print("\n*** REMINDERS ***")
 print(" |θp| + |θs| = 45 degrees.")
-print(" σ3 is always at zero.")
+print(" σ3 is always at zero0. Out of plane constant.")
 
 
 if visualize:
