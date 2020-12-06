@@ -79,10 +79,16 @@ print("Torque = {}".format(torque))
 print("Moment = {}".format(moment))
 print("Pressure = {}\n".format(pressure))
 
+ratio = inner_radius/thickness
+print("Radius/Thickness = {}".format(ratio))
+if ratio > 10:
+    print("Ratio is >10. Valid thin wall p.v. approximation.")
+else:
+    print("Ratio is <10. Does not satisfy thin wall p.v. approximations")
 
 # Calculations
 outer_radius = inner_radius+thickness
-print("Outer Radius = {}".format(outer_radius))
+print("\nOuter Radius = {}".format(outer_radius))
 
 area = np.pi*(outer_radius**2 - inner_radius**2)
 print("Area = {}".format(area))
