@@ -16,7 +16,7 @@ theta_deg = args.deg  # degrees, ccw is positive
 visualize = args.v
 
 print("σ x = {}".format(sigma_x))
-print("σ x = {}".format(sigma_y))
+print("σ y = {}".format(sigma_y))
 print("τ xy = {}".format(tau_xy))
 print("θ = {}".format(theta_deg))
 
@@ -144,7 +144,7 @@ print("Radius (τ max) = {:.6f}".format(abs(tau_max_in_plane)))
 
 print("\n*** REMINDERS ***")
 print(" |θp| + |θs| = 45 degrees.")
-print(" σ3 is always at zero0. Out of plane constant.")
+print(" σ3 is always at zero. Out of plane constant.")
 
 
 if visualize:

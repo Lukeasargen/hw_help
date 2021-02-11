@@ -48,8 +48,8 @@ v z+
 """
 
 parser = argparse.ArgumentParser(description="Shear Tranforms and Mohr's Circle")
-parser.add_argument('--ri', type=float, required=True, metavar="Inner Radius")
-parser.add_argument('--d', type=float, required=True, metavar="Thickness")
+parser.add_argument('--ri', type=float, required=True, metavar="Inner Radius. Set to 0 for solid shaft.")
+parser.add_argument('--d', type=float, required=True, metavar="Thickness. Set to radius for solid shaft.")
 parser.add_argument('--f', type=float, default=0.0, metavar="Axial Force")
 parser.add_argument('--t', type=float, default=0.0, metavar="Torque")
 parser.add_argument('--m', type=float, default=0.0, metavar="Moment")
