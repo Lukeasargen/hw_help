@@ -1,0 +1,4 @@
+Drill Velocity (mm/min),Total cycle time for a drilled hole (sec),Dill life (no. of holes),Drill wear/failure observation
+80,8,45,Moderate wear on the tool tip
+185,4.9,16,Tool broke at the 16th hole and flew away
+234,3.3,3,Tool broke in the middle of the 3rd hole
