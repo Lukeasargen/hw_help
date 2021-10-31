@@ -1,0 +1,21 @@
+Measurement,Material,Initial,Cold Rolling - Pass 1,Cold Rolling - Pass 2,Cold Rolling - Pass 3,"Hot Rolling (700F,  3 Passes)"
+Thickness (mm),AL 6061-T6,3.5,2.46,2.08,1.61,
+Thickness (mm),AL 6061-0,3.2,2.73,2.04,1.63,
+Thickness (mm),Brass 360-H02,3.36,2.7,2.3,1.72,1.64
+Thickness (mm),Brass 360-0,3.23,2.72,2.25,1.8,
+Width (mm),AL 6061-T6,25.5,25.36,25.52,25.63,
+Width (mm),AL 6061-0,25.37,25.46,25.54,25.7,
+Width (mm),Brass 360-H02,25.61,25.33,26.19,26.12,25.66
+Width (mm),Brass 360-0,24.3,24.51,25.7,26.01,
+Length (mm),AL 6061-T6,50.35,63.5,77.79,101.6,
+Length (mm),AL 6061-0,50.35,60.96,74.4,92.87,
+Length (mm),Brass 360-H02,51.51,61.38,72.62,85.72,98.34
+Length (mm),Brass 360-0,50.92,59.51,69.85,88.9,
+Vickers Hardness (HV),AL 6061-T6,164,,,175,
+Vickers Hardness (HV),AL 6061-0,102,,,143,
+Vickers Hardness (HV),Brass 360-H02,300,,,337,242
+Vickers Hardness (HV),Brass 360-0,235,,,305,
+Volume (mm^3),AL 6061-T6,4493.7375,3961.4856,4129.217664,4192.45288,
+Volume (mm^3),AL 6061-0,4087.6144,4237.073568,3876.35904,3890.41717,
+Volume (mm^3),Brass 360-H02,4432.414896,4197.83958,4374.41094,3851.091008,4138.383216
+Volume (mm^3),Brass 360-0,3996.65988,3967.365072,4039.07625,4162.1202,
