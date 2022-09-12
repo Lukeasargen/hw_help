@@ -6,7 +6,7 @@ import pandas as pd
 data = {
     "Gas": ["N2", "CO2", "H2O", "O2", "CO", "NO"],
     "kmol": [10, 1.5, 2, 0.5, 0.1, 0.005],
-    "kg/kmol": [14, 44, 18, 32, 28, 30],
+    "kg/kmol": [28, 44, 18, 32, 28, 30],
 }
 
 df = pd.DataFrame(data)
