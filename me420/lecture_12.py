@@ -56,7 +56,7 @@ print(f"A_throat = {A_throat} m^2")
 df["A/A*"] = df["Area [m^2]"]/A_throat
 
 exit_idx = df["x [m]"].idxmax()  # exit is the highest x
-A_exit = df.loc[exit_idx, "x [m]"]
+A_exit = df.loc[exit_idx, "Area [m^2]"]
 print(f"A_exit = {A_exit} m^2")
 
 P_star = Pb/P0
