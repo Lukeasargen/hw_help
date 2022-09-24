@@ -7,10 +7,10 @@ N_kg_kmol = 14
 # Fuel
 # 1 molar unit
 # Cx Hy Oz
-x = 2
-y = 6
-z = 1
-equiv_ratio = 0.9
+x = 8
+y = 18
+z = 0
+equiv_ratio = 1.0
 
 O2_vol = 0.21
 N2_vol = 0.79  # includes the other intert gases like Argon
@@ -27,10 +27,17 @@ a = x + y/4 - z/2
 b = x
 c = y/2
 d = N2_mole_per_O2 * a
-print(f"{a=:.4e}")
-print(f"{b=:.4e}")
-print(f"{c=:.4e}")
-print(f"{d=:.4e}")
+print("CxHyOz + a*(O2+3.76N2) -> b*CO2 + c*H2O + d*N2")
+print(f"{a=:.4e} {a=}")
+print(f"{b=:.4e} {b=}")
+print(f"{c=:.4e} {c=}")
+print(f"{d=:.4e} {d=}")
+
+print("Number of each atom on LHS")
+print(f"Carbon: {x}")
+print(f"Hydrogen: {y}")
+print(f"Oxygen: {z+2*a}")
+print(f"Nitrogen: {2*d}")
 
 print("WITHOUT equiv_ratio")
 air_kg_kmol = a * (O2_kg_kmol + N2_mole_per_O2 * N2_kg_kmol)
