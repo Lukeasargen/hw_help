@@ -56,9 +56,9 @@ s2 = cp*np.log(T_ratio) - R*np.log(P_ratio) + s1
 print(f"{s2 = } J/Kg*K")
 
 # PLOTS Corrected from hw_05
-samples = 250  # Number of test points for M2
+samples = 50  # Number of test points for M2
 
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,4))
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(6,4))
 
 # M2_list = np.linspace(0.1, 4.0, samples)
 M2_list = np.exp(np.linspace(np.log(0.1), np.log(8.0), samples))
@@ -90,10 +90,22 @@ for curve_name, linestyle in zip(curve_names, linestyles):
     df[f"{curve_name} s2"] = cp*np.log(df[f"{curve_name} T2/T1"]) - R*np.log(df[f"{curve_name} P2/P1"]) + s1
     df.plot(x=f"{curve_name} s2", y=f"{curve_name} h2", ax=ax, label=f"{curve_name}", linestyle=linestyle)
 
-print(df)
+# Hugoniot is a completely different process
+# Create the density ratios
+density_ratio_list = np.linspace(0.3, 8.0, samples)
+df2 = pd.DataFrame(density_ratio_list, columns=["rho2/rho1"])
+# Find P2/P1 with hugoniot equation
+df2["Hugoniot P2/P1"] = hugoniot_curve(df2["rho2/rho1"], gamma=gamma)
+# Find T1/T1 with ideal gas: T2/T1 = P2/P1 * rho1/rho2
+df2["Hugoniot T2/T1"] = df2["Hugoniot P2/P1"]/df2["rho2/rho1"]
+# Find T2, h2, s2
+df2["Hugoniot T2"] = df2["Hugoniot T2/T1"]*T1
+df2["Hugoniot h2"] = df2["Hugoniot T2"]*cp
+df2["Hugoniot s2"] = cp*np.log(df2["Hugoniot T2/T1"]) - R*np.log(df2["Hugoniot P2/P1"]) + s1
+df2.plot(x="Hugoniot s2", y="Hugoniot h2", ax=ax, label="Hugoniot. Correct", linestyle="--")
 
-ax.set_xlim([1300, 2500])
-ax.set_ylim([1e5, 1e6])
+ax.set_xlim([0, 2550])
+ax.set_ylim([0, 1.2e6])
 
 ax.plot(s1, h1, marker="*")
 ax.annotate(f"{M1=:.2f}", (s1, h1))
@@ -102,5 +114,6 @@ ax.annotate(f"{M2=:.2f}", (s2, h2))
 ax.set_title("Mollier diagram")
 ax.set_xlabel("Entropy [J/Kg*K]")
 ax.set_ylabel("Enthalpy [J/Kg]")
+ax.grid()
 fig.tight_layout()
 plt.show()
