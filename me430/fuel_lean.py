@@ -1,69 +1,75 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
 # Constants
 C_kg_kmol = 12
 H_kg_kmol = 1
 O_kg_kmol = 16
 N_kg_kmol = 14
+Ru = 8315  # J/Kmol*K, reactants
 
-# Fuel
-# 1 molar unit
-# Cx Hy Oz
-x = 7
-y = 16
-z = 0
-
-# Use to get
-#   - mole fractions in reactants
-#   - mole fractions in products
-#   - stoich air-fuel ratio
-equiv_ratio = 0.8  # <1.0
-
-# use to find the equiv_ratio need for each product to have this mole fraction
-x_prod = 0.05
+# Inputs
+# Fuel, 1 molar unit, CxHyOz
+x = 3; y = 6; z = 0
+equiv_ratio = 0.7  # <1.0
+P = 4*101325  # atm -> Pa, reactants
+T = 1500  # K, reactants
 
 # Calculations below
 inv_equiv_ratio = 1/equiv_ratio
-
 O2_vol = 0.21
 N2_vol = 0.79  # includes the other intert gases like Argon
 N2_mole_per_O2 = 3.76  # N2_vol/O2_vol 3.76 moles N2 per 1 mole O2
-
-N2_kg_kmol = 2*N_kg_kmol
+# molecular weights
+fuel_kg_kmol = x*C_kg_kmol + y*H_kg_kmol + z*O_kg_kmol
 O2_kg_kmol = 2*O_kg_kmol
+N2_kg_kmol = 2*N_kg_kmol
+CO2_kg_kmol = C_kg_kmol + 2*O_kg_kmol
+H2O_kg_kmol = 2*H_kg_kmol + O_kg_kmol
 
+# Global one-step mechanism
 print("CxHyOz + a*(O2+3.76N2) -> b*CO2 + c*H2O + e*O2 + f*N2")
 a = x + y/4 - z/2
 b = x
 c = y/2
-e = (inv_equiv_ratio-1)*a
-f = N2_mole_per_O2*inv_equiv_ratio*a
-print(f"{a=:.4e}")
-print(f"{b=:.4e}")
-print(f"{c=:.4e}")
-print(f"{e=:.4e}")
-print(f"{f=:.4e}")
+e = a
+f = N2_mole_per_O2*a
+print(f"{a=}")
+print(f"{inv_equiv_ratio*a=}")
+print(f"{b=}")
+print(f"{c=}")
+print(f"{e=}")
+print(f"{(inv_equiv_ratio-1)*e=}")
+print(f"{f=}")
+print(f"{inv_equiv_ratio*f=}")
 
-print("Mole Fractions using equiv_ratio")
-air_kmol = a*(1+N2_mole_per_O2)
-reactant_kmol = 1 + air_kmol
-print(f"REACTANTS. {reactant_kmol=}")
-print(f"X CxHyOz = {1/reactant_kmol:.4f}")
-print(f"X O2+{N2_mole_per_O2}N2 = {air_kmol/reactant_kmol:.4f}")
+reactants = {
+    "Gas": ["CxHyOz", "O2", "N2"],
+    "kmol": [1, inv_equiv_ratio*a*1, inv_equiv_ratio*a*N2_mole_per_O2],
+    "kg/kmol": [fuel_kg_kmol, O2_kg_kmol, N2_kg_kmol],
+}
+reactants = pd.DataFrame(reactants)
 
-print("AF with equiv_ratio")
-air_kg_kmol = inv_equiv_ratio * a * (O2_kg_kmol + N2_mole_per_O2 * N2_kg_kmol)
-fuel_kg_kmol = x*C_kg_kmol + y*H_kg_kmol + z*O_kg_kmol
-AF_stoich = air_kg_kmol/fuel_kg_kmol
-print(f"{air_kg_kmol=}")
-print(f"{fuel_kg_kmol=}")
-print(f"{AF_stoich=}")
+products = {
+    "Gas": ["CO2", "H2O", "O2", "N2"],
+    "kmol": [b, c, (inv_equiv_ratio-1)*e, inv_equiv_ratio*f],
+    "kg/kmol": [CO2_kg_kmol, H2O_kg_kmol, O2_kg_kmol, N2_kg_kmol],
+}
+products = pd.DataFrame(products)
 
-product_kmol = b+c+e+f
-print(f"PRODUCTS. {product_kmol=}")
-print(f"X CO2 = {b/product_kmol:.4f}")
-print(f"X H2O = {c/product_kmol:.4f}")
-print(f"X O2 = {e/product_kmol:.4f}")
-print(f"X N2 = {f/product_kmol:.4f}")
+for df, name in [(reactants, "Reactants"), (products, "Products")]:
+    total_kmols = df["kmol"].sum()
+    print(f"{name} Total kmol: {total_kmols} kmol")
+    df["Mole Fraction"] = df["kmol"]/total_kmols
+    total_molecular_weight = (df["Mole Fraction"]*df["kg/kmol"]).sum()
+    print(f"{name} Total Molecular Weight: {total_molecular_weight} kg/kmol")
+    print(f"{name} Total Mass: {total_kmols*total_molecular_weight} kg")
+    df["Mass Fraction"] = (df["Mole Fraction"]*df["kg/kmol"])/total_molecular_weight
 
-print(f"PRODUCTS set to {x_prod=}")
-equiv_ratio_O2 = (a*(1-x_prod*(1+N2_mole_per_O2)))/(x_prod*(x+y/2-a)+a)
-print(f"X O2=x_prod: equiv_ratio={equiv_ratio_O2}")
+print("INTIAL REACTANTS.")
+reactants["Molar Concentation"] = (reactants["Mole Fraction"]*P)/(Ru*T)
+print(reactants)
+
+print("GLOBAL ONE-STEP APPROXIMATIONS PRODCUTS.")
+print(products)
