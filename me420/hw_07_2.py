@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy.optimize import fsolve
 
 def shock_M2_from_M1(M1, gamma=1.4):
     top = 1 + ((gamma-1)/2)*M1**2
@@ -15,10 +16,31 @@ def shock_T_ratio_from_M1(M1, gamma=1.4):  # T2/T1
     part2 = (2 + (gamma-1)*M1*M1)/((gamma+1)*M1*M1)
     return part1*part2
 
+def shock_a_ratio_from_M1(M1, gamma=1.4):  # a2/a1
+    top = 2*(gamma-1)*(gamma*M1*M1 - 1/(M1*M1) - (gamma-1))
+    bot = (gamma+1)**2
+    return np.sqrt(1 + top/bot)
+
+def shock_rho_ratio_from_M1(M1, gamma=1.4):  # rho2/rho1
+    term = 2*(1 - 1/(M1*M1)) / (gamma+1)
+    return 1/(1-term)
+
+def Mas_from_M1(M1, gamma=1.4):
+    return M1/np.sqrt(shock_T_ratio_from_M1(M1, gamma=gamma)) - shock_M2_from_M1(M1, gamma=gamma)
+
+def M1_from_Mas(Mas, gamma=1.4):
+    def f(M, Mas, gamma):
+        return Mas - Mas_from_M1(M, gamma)
+    M_guess = np.array([1.0]*len(Mas))
+    M1 = fsolve(f, M_guess, args=(Mas, gamma))
+    return M1
+
 # Constants
 gamma = 1.4
 R = 287.0  # J/Kg*K
 cp = 1005  # J/Kg*K
+J_per_kiloton = 4.184e12  # Joules in kiloton of TNT
+J_per_megaton = 4.184e15  # Joules in megaton of TNT
 
 # Given: ambient
 T_atm = 308.15  # K, ambient temperature
@@ -27,9 +49,10 @@ rho_atm = P_atm/(R*T_atm)  # kg/m^3, ambient density
 print(f"{rho_atm = } kg/m^3")
 
 # first atomic bomb measurements
-E_1 = (18.6*1000)*(4184*1000)  # J, 18.6 kilotons of TNT to J
+kiloton_1 = 18.6
 R_1 = 210  # m, radius at T_1
 T_1 = 0.1  # s, time
+E_1 = kiloton_1*J_per_kiloton  # J, 18.6 kilotons of TNT to J
 print(f"{E_1 = :e} {E_1}")
 
 # dimensionless_parameter
@@ -45,6 +68,8 @@ R_2 = 482  # m, radius
 T_2 = 0.113  # s, time
 E_2 = (pi_1 * R_2**-1 * rho_atm**-a * T_2**-c)**(1/b)
 print(f"{E_2 = :e} {E_2}")
+megaton_2 = E_2/J_per_megaton
+print(f"{megaton_2 = :e} {megaton_2}")
 
 # Plots are for bomb 2
 t = np.linspace(0.1, 3.0, 100)
@@ -57,20 +82,40 @@ df["Vs [m/s]"] = K * df["t [s]"]**(-c-1)
 a1 = np.sqrt(gamma*R*T_atm)
 print(f"{a1 = } m/s")
 df["Ms"] = df["Vs [m/s]"]/a1
-# Static properties are the same for moving normal shocks
+
+# Define the shock to be Ms=1 after Ms hits 1
+df.loc[df["Ms"]<1, "Ms"] = 1  # If Ms<1, set Ms=1
+
+# Static properties are the same for normal shocks
 df["P2/P1"] = shock_P_ratio_from_M1(df["Ms"], gamma=gamma)
 df["Pas [kPa]"] = df["P2/P1"]*P_atm/1000
 df["T2/T1"] = shock_T_ratio_from_M1(df["Ms"], gamma=gamma)
 df["Tas [K]"] = df["T2/T1"]*T_atm
+df["a2"] = np.sqrt(gamma*R*df["Tas [K]"])
+# df["a2"] = np.sqrt(df["T2/T1"])*a1
+
+# Use M2 to find Mas
+df["M2"] = shock_M2_from_M1(df["Ms"], gamma=gamma)
+# df["V2 [m/s]"] = df["M2"]*df["a2"]
+# df["Vas [m/s]"] = df["Vs [m/s]"]-df["V2 [m/s]"]
+# df["Mas"] = df["Vas [m/s]"]/df["a2"]
+# df["Mas"] = df["Vs [m/s]"]/df["a2"] - df["M2"]
+df["Mas"] = Mas_from_M1(df["Ms"], gamma=gamma)
+df.loc[df["Mas"]<0, "Mas"] = 0  # If Ms<1, set Ms=1
 
 # 2e) Find Ms=1 -> Vs=a1
-t_mach = ((gamma*R*T_atm)/(K*K))**(1/(-2*c-2))
-print(f"{t_mach = } s")
-R_mach = pi_1 * rho_atm**-a * E_2**-b * t_mach**-c
-print(f"{R_mach = } m")
+t_e1 = ((gamma*R*T_atm)/(K*K))**(1/(-2*c-2))
+print(f"{t_e1 = } s")
+R_e1 = pi_1 * rho_atm**-a * E_2**-b * t_e1**-c
+print(f"{R_e1 = } m")
 
-df.loc[df["Ms"]<1, "Ms"] = 1
-df["Mas"] = shock_M2_from_M1(df["Ms"], gamma=gamma)  # If Ms<1, set Ms=1
+# 2e) Find Mas=1
+M1_e2 = M1_from_Mas([1], gamma=gamma)[0]
+print(f"{M1_e2 = }")
+t_e2 = ((M1_e2*a1)/K)**(1/(-c-1))
+print(f"{t_e2 = } s")
+R_e2 = pi_1 * rho_atm**-a * E_2**-b * t_e2**-c
+print(f"{R_e2 = } m")
 
 # 2f Find Pas=300 kPa
 Pf = 300e3   # Pa, bc P_atm is in Pa
