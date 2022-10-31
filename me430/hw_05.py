@@ -81,9 +81,10 @@ print(products)
 # Find the intitial-time-rate-of-change of fuel molar concentration
 print("initial time-rate-of-change of fuel molar concentration")
 # Values are given, they also come from Table 5.1
-A = 1.3e9  # (kmol/m3)^(1-m-n) / s 
-m = -0.2
-n = 1.3
+A = 1.3e8  # (kmol/m3)^(1-m-n) / s 
+b = 0
+m = -0.3  # order methane
+n = 1.3  # order oxygen
 EA = 202525*1000  # J/Kmol, given in kJ but converted to J
 
 def get_value(df, gas, col):
@@ -91,23 +92,23 @@ def get_value(df, gas, col):
 
 fuel_c = get_value(reactants, "CxHyOz", "Molar Concentration")
 O2_c = get_value(reactants, "O2", "Molar Concentration")
-fuel_k = -A * np.exp(-EA/(Ru*T)) * fuel_c**m * O2_c**n
+fuel_k = -A * T**b * np.exp(-EA/(Ru*T)) * fuel_c**m * O2_c**n
 print(f"d[CxHyOz]/dt = {fuel_k} kmol/m3-s")  # negative because it's depleted
 X_fuel = get_value(reactants, "CxHyOz", "Mole Fraction")
 X_O2 = get_value(reactants, "O2", "Mole Fraction")
-fuel_k = -A * np.exp(-EA/(Ru*T)) * X_fuel**m * X_O2**n * (P/(Ru*T))**(m+n)
+fuel_k = -A * T**b *np.exp(-EA/(Ru*T)) * X_fuel**m * X_O2**n * (P/(Ru*T))**(m+n)
 print(f"d[CxHyOz]/dt = {fuel_k} kmol/m3-s")  # negative because it's depleted
 
-def ODE_rates(molar_concentration, t, A, m, n, EA):  # t is required for ODE solver
+def ODE_rates(molar_concentration, t, T, A, b, m, n, EA):  # t is required for ODE solver
     fuel_c, O2_c, CO2_c, H2O_c = molar_concentration
-    d_fuel = -A * np.exp(-EA/(Ru*T)) * fuel_c**m * O2_c**n
-    d_O2 = 2.5*d_fuel
+    d_fuel = -A * T**b * np.exp(-EA/(Ru*T)) * fuel_c**m * O2_c**n
+    d_O2 = 2*d_fuel  # there are 2.5 kmol reac - 0.5 kmol prod = 2 kmol net O2
     d_C02 = -d_fuel
     d_H2O = -2*d_fuel
     omega_dot = np.array([d_fuel, d_O2, d_C02, d_H2O])
     sum_c = np.sum(molar_concentration)
     sum_omega = np.sum(omega_dot)
-    return omega_dot - molar_concentration*(sum_omega/sum_c)
+    return omega_dot # - molar_concentration*(sum_omega/sum_c)
 
 # constant-pressure, constant-temperature
 # dP/dt = dT/dt = 0
@@ -119,21 +120,24 @@ molar_concentration = np.array([
 ])  # kmol/m^3, Initial conditions
 print(f"{molar_concentration = }")
 
-t = np.linspace(0, 1, 1000)
-sol = odeint(ODE_rates, molar_concentration, t, args=(A, m, n, EA))
+t = np.linspace(0, 150, 10000)
+sol = odeint(ODE_rates, molar_concentration, t, args=(T, A, b, m, n, EA))
 
 idxs = (sol[:,0]>molar_concentration[0]*0.001)  # CH4 0.1% of initial
 sol = sol[idxs]
 t = t[idxs]
 
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,4))
-ax.plot(t, sol[:, 0], linestyle="-", label='CH4')
-ax.plot(t, sol[:, 1], linestyle="--", label='O2')
-ax.plot(t, sol[:, 2], linestyle="-.", label='CO2')
-ax.plot(t, sol[:, 3], linestyle=":", label='H2O')
+ax.plot(t, sol[:, 0], label='CH4', linestyle="solid", color='red')
+ax.plot(t, sol[:, 1], label='O2', linestyle="dashed", color='blue')
+ax.plot(t, sol[:, 2], label='CO2', linestyle="dashdot", color='green')
+ax.plot(t, sol[:, 3], label='H2O', linestyle="dotted", color='black')
 ax.legend(loc='best')
+ax.set_title("Time evolution of molar concentrations")
 ax.set_xlabel('Time [s]')
 ax.set_ylabel("Molar Concentration [kmol/m^3]")
+ax.set_xlim(left=0)
+ax.set_ylim(bottom=0)
 ax.grid()
 fig.tight_layout()
 plt.show()
