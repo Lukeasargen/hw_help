@@ -75,105 +75,99 @@ xL = -12  # m, low pressure side
 xR = 18  # m, high pressure side
 
 # Calculations
-a1 = np.sqrt(gamma1*R1*T1)
-a4 = np.sqrt(gamma4*R4*T4)
-print(f"{a1 = } m/s")
-print(f"{a4 = } m/s")
+def shock_tube(low_pressure_state, high_pressure_state, x):
+    P1, T1, gamma1, R1 = low_pressure_state
+    P4, T4, gamma4, R4 = high_pressure_state
+    xL, xR = x
+    a1 = np.sqrt(gamma1*R1*T1)
+    a4 = np.sqrt(gamma4*R4*T4)
+    rho1 = P1/(R1*T1)
+    rho4 = P4/(R4*T4)
+    P4_P1_ratio = P4/P1
+    Ms = Ms_from_P4_P1([P4_P1_ratio], gamma=(gamma1, gamma4), a=(a1, a4))[0]
+    Vs = Ms*a1
+    P2_P1_ratio = shock_P_ratio_from_M1(Ms, gamma=gamma1)
+    P2 = P2_P1_ratio*P1
+    T2_T1_ratio = shock_T_ratio_from_M1(Ms, gamma=gamma1)
+    T2 = T2_T1_ratio*T1
+    a2 = np.sqrt(gamma1*R1*T2)
+    V3 = Vcs = Vas = V2 = Vcs_from_Ms(Ms, gamma1, a1)
+    M2 = V2/a2
+    a3_a4_ratio = 1 - ((gamma4-1)/2)*(V3/a4)
+    a3 = a3_a4_ratio*a4
+    T3_T4_ratio = (a3/a4)**2
+    T3 = T3_T4_ratio*T4
+    P3_P4_ratio = (a3/a4)**((2*gamma4)/(gamma4-1))
+    P3 = P3_P4_ratio*P4
+    rho3_rho4_ratio = (a3/a4)**((2)/(gamma4-1))
+    rho3 = rho3_rho4_ratio*rho4
+    tR = abs(xR/Vs)
+    tL = abs(xL/a4)
+    # Reflection xR
+    Msr = Msr_from_Ms(np.array([Ms]), a1, a2)[0]
+    Vsr = Vsr_from_Ms(Ms, gamma1, a1)
+    M5 = shock_M2_from_M1(Msr, gamma=gamma1)
+    T5_T2_ratio = shock_T_ratio_from_M1(Msr, gamma=gamma1)
+    T5 = T5_T2_ratio*T2
+    P5_P2_ratio = shock_P_ratio_from_M1(Msr, gamma=gamma1)
+    P5 = P5_P2_ratio*P2
 
-rho1 = P1/(R1*T1)
-rho4 = P4/(R4*T4)
-print(f"{rho1 = } kg/m^2")
-print(f"{rho4 = } kg/m^2")
+    states =  {
+        "P1": P1, "T1": T1, "gamma1": gamma1, "R1": R1,
+        "P4": P4, "T4": T4, "gamma4": gamma4, "R4": R4,
+        "xL": xL, "xR": xR,
+        "a1": a1, "a4": a4,
+        "rho1": rho1, "rho4": rho4,
+        "P4_P1_ratio": P4_P1_ratio,
+        "Ms": Ms, "Vs": Vs,
+        "P2_P1_ratio": P2_P1_ratio, "P2": P2,
+        "T2_T1_ratio": T2_T1_ratio, "T2": T2,
+        "V3": V3, "Vcs": Vcs, "Vas": Vas, "V2": V2,
+        "a2": a2, "M2": M2,
+        "a3_a4_ratio": a3_a4_ratio, "a3": a3,
+        "T3_T4_ratio": T3_T4_ratio, "T3": T3,
+        "P3_P4_ratio": P3_P4_ratio, "P3": P3,
+        "rho3_rho4_ratio": rho3_rho4_ratio, "rho3": rho3,
+        "Vcs-a3": Vcs-a3,
+        "tR": tR, "tL": tL,
+        "Msr": Msr, "Vsr": Vsr,
+        "M5": M5,
+        "T5_T2_ratio": T5_T2_ratio, "T5": T5,
+        "P5_P2_ratio": P5_P2_ratio, "P5": P5,
+        "gamma4": gamma4,
+    }
+    return states
 
-P4_P1_ratio = P4/P1
-print(f"{P4_P1_ratio = }")
-Ms = Ms_from_P4_P1([P4_P1_ratio], gamma=(gamma1, gamma4), a=(a1, a4))[0]
-Vs = Ms*a1
-print(f"{Ms = }")
-print(f"{Vs = } m/s")
-
-# 2a) P2, P3, T2, T3, Ms, Vs, Vcv
-P2_P1_ratio = shock_P_ratio_from_M1(Ms, gamma=gamma1)
-P2 = P2_P1_ratio*P1
-print(f"{P2_P1_ratio = }")
-print(f"{P2/1000 = } kPa")
-
-T2_T1_ratio = shock_T_ratio_from_M1(Ms, gamma=gamma1)
-T2 = T2_T1_ratio*T1
-print(f"{T2_T1_ratio = }")
-print(f"{T2 = } K")
-
-a2 = np.sqrt(gamma1*R1*T2)
-V3 = Vcs = Vas = V2 = Vcs_from_Ms(Ms, gamma1, a1)
-M2 = V2/a2
-print(f"{a2 = } m/s")
-print(f"{Vcs = } m/s")
-print(f"{M2 = }")
-
-a3_a4_ratio = 1 - ((gamma4-1)/2)*(V3/a4)
-a3 = a3_a4_ratio*a4
-print(f"{a3_a4_ratio = }")
-print(f"{a3 = } m/s")
-
-T3_T4_ratio = (a3/a4)**2
-T3 = T3_T4_ratio*T4
-print(f"{T3_T4_ratio = }")
-print(f"{T3 = } K")
-
-P3_P4_ratio = (a3/a4)**((2*gamma4)/(gamma4-1))
-P3 = P3_P4_ratio*P4
-print(f"{P3_P4_ratio = }")
-print(f"{P3/1000 = } kPa")
-
-rho3_rho4_ratio = (a3/a4)**((2)/(gamma4-1))
-rho3 = rho3_rho4_ratio*rho4
-print(f"{rho3_rho4_ratio = }")
-print(f"{rho3 = } kg/m^2")
-
-# 2b)
-print(f"{Vs = } m/s")
-print(f"{Vcs = } m/s")
-print(f"{a3-Vcs = } m/s")
-print(f"{a4 = } m/s")
-
-tR = xR/Vs
-print(f"{tR = } s")
-tL = -xL/a4
-print(f"{tL = } s")
-
-# 2c)
-Msr = Msr_from_Ms(np.array([Ms]), a1, a2)[0]
-print(f"{Msr = }")
-Vsr = Vsr_from_Ms(Ms, gamma1, a1)
-print(f"{Vsr = } m/s")
-M5 = shock_M2_from_M1(Msr, gamma=gamma1)
-print(f"{M5 = }")
-T5_T2_ratio = shock_T_ratio_from_M1(Msr, gamma=gamma1)
-T5 = T5_T2_ratio*T2
-print(f"{T5_T2_ratio = }")
-print(f"{T5 = } K")
-P5_P2_ratio = shock_P_ratio_from_M1(Msr, gamma=gamma1)
-P5 = P5_P2_ratio*P2
-print(f"{P5_P2_ratio = }")
-print(f"{P5/1000 = } kPa")
+states1 = shock_tube(
+    low_pressure_state = (P1, T1, gamma1, R1),
+    high_pressure_state = (P4, T4, gamma4, R4),
+    x = (xL, xR),
+)
+print(f"{states1=}")
 
 # 2d)
-V3d = a4/(1+((gamma4-1)/2))
+V3d = states1["a4"]/(1+((gamma4-1)/2))
 print(f"{V3d = } m/s")
-Msd = Ms_from_Vcs([V3d], gamma1, a1)[0]
+Msd = Ms_from_Vcs([V3d], gamma1, states1["a1"])[0]
 print(f"{Msd = }")
-P4_P1_ratio_d = P4_P1_from_Ms(Msd, gamma=(gamma1, gamma4), a=(a1, a4))
+P4_P1_ratio_d = P4_P1_from_Ms(Msd, gamma=(gamma1, gamma4), a=(states1["a1"], states1["a4"]))
 P4d = P4_P1_ratio_d*P1
 print(f"{P4_P1_ratio_d = }")
 print(f"{P4d/1000 = } kPa")
 
-# Plot these states on x-t diagram
+states2 = shock_tube(
+    low_pressure_state = (P1, T1, gamma1, R1),
+    high_pressure_state = (P4d, T4, gamma4, R4),
+    x = (xL, xR),
+)
+print(f"{states2=}")
 
+# Plot states1 on x-t diagram
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,3))
-ax.plot([0,xR],[0,tR], label="Vs", linestyle="-")
-ax.plot([0,xL],[0,tL], label="a4", linestyle=":")
-ax.plot([0,tR*Vcs],[0,tR], label="Vcs", linestyle="--")
-ax.plot([0,tR*(a3-Vcs)],[0,tR], label="a3-Vcs", linestyle="-.")
+ax.plot([0,xR],[0,states1["tR"]], label="Vs", linestyle="-")
+ax.plot([0,xL],[0,states1["tL"]], label="a4", linestyle=":")
+ax.plot([0,states1["tR"]*states1["Vcs"]],[0,states1["tR"]], label="Vcs", linestyle="--")
+ax.plot([0,states1["tR"]*states1["Vcs-a3"]],[0,states1["tR"]], label="Vcs-a3", linestyle="-.")
 
 ax.set_xlabel("x [m]")
 ax.set_ylabel("t [s]")
