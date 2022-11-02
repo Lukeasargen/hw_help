@@ -83,7 +83,7 @@ for df, name in [(reactants, "Reactants"), (products, "Products")]:
     df["Mass Fraction"] = (df["Mole Fraction"]*df["kg/kmol"])/total_molecular_weight
 
 print("INTIAL REACTANTS.")
-reactants["Molar Concentation"] = (reactants["Mole Fraction"]*P)/(Ru*T_reac)
+reactants["Molar Concentration"] = (reactants["Mole Fraction"]*P)/(Ru*T_reac)
 print(reactants)
 
 print("GLOBAL FUEL-RICH ONE-STEP APPROXIMATIONS PRODCUTS.")

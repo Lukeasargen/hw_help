@@ -68,7 +68,7 @@ for df, name in [(reactants, "Reactants"), (products, "Products")]:
     df["Mass Fraction"] = (df["Mole Fraction"]*df["kg/kmol"])/total_molecular_weight
 
 print("INTIAL REACTANTS.")
-reactants["Molar Concentation"] = (reactants["Mole Fraction"]*P)/(Ru*T)
+reactants["Molar Concentration"] = (reactants["Mole Fraction"]*P)/(Ru*T)
 print(reactants)
 
 print("GLOBAL ONE-STEP APPROXIMATIONS PRODCUTS.")
