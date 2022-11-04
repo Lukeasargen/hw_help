@@ -13,12 +13,12 @@ Ru = 8315  # J/Kmol*K, reactants
 # Inputs
 # Fuel, 1 molar unit, CxHyOz
 x = 3; y = 8; z = 0
-equiv_ratio = 1.2  # <1.0
-P = 4*101325  # atm -> Pa, reactants
-T_reac = 1000  # K, reactants
-# water-gas shift reactions
+equiv_ratio = 1.1  # <1.0
+P = 1*101325  # atm -> Pa, reactants
+T_reac = 400  # K, reactants
+# water-gas shift reactions, Check in Table 2.3
 T_wgsr = 3000  # K
-Kp = 0.138  # parital-pressure equilibrium constant at the given temperature
+Kp = 0.1378  # parital-pressure equilibrium constant at the given temperature
 
 # Calculations below
 inv_equiv_ratio = 1/equiv_ratio
