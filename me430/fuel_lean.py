@@ -11,10 +11,10 @@ Ru = 8315  # J/Kmol*K, reactants
 
 # Inputs
 # Fuel, 1 molar unit, CxHyOz
-x = 3; y = 6; z = 0
-equiv_ratio = 0.7  # <1.0
-P = 4*101325  # atm -> Pa, reactants
-T = 1500  # K, reactants
+x = 1; y = 4; z = 1
+equiv_ratio = 1.0  # <1.0
+P = 1*101325  # atm -> Pa, reactants
+T = 300  # K, reactants
 
 # Calculations below
 inv_equiv_ratio = 1/equiv_ratio
@@ -73,3 +73,16 @@ print(reactants)
 
 print("GLOBAL ONE-STEP APPROXIMATIONS PRODCUTS.")
 print(products)
+
+f_stoic = fuel_kg_kmol / (fuel_kg_kmol + inv_equiv_ratio*a*(O2_kg_kmol + N2_mole_per_O2*N2_kg_kmol))
+print(f"Mixture fraction. {f_stoic = }")
+
+# carbon element mass fraction
+z_c_fuel = x*C_kg_kmol / fuel_kg_kmol
+print(f"{z_c_fuel = }")
+# hydrogen element mass fraction
+z_h_fuel = y*H_kg_kmol / fuel_kg_kmol
+print(f"{z_h_fuel = }")
+# carbon-plus-hydrogen element mass fraction
+z_ch_fuel = z_c_fuel + z_h_fuel
+print(f"{z_ch_fuel = }")
